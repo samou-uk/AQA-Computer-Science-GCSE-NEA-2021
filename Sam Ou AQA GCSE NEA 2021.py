@@ -2,6 +2,7 @@
 from tkinter import *
 import tkinter as tk
 from tkinter import messagebox
+import os
 #messagebox is for the error boxes i have used
 
 import pandas as pd
@@ -124,11 +125,29 @@ def calculations():
         print("[ " + msg + " ]")
 
     header("Flight Data")
-    raw_data = {"Airport Name": ["John F Kennedy International", "Paris-Orly", "Adolfo Suarez Madrid-Barajas",
-                                 "Amsterdam Schipol", "Cairo International"],
-                "Airport Code": ["JFK", "ORY", "MAD", "AMS", "CAI"],
-                "Liverpool John Lennon": [5326, 629, 1428, 526, 3779],
-                "Bournemouth International": [5486, 379, 1151, 489, 3584]}
+    def prepend_line(file_name, line):
+      """ Insert given string as a new line at the beginning of a file """
+      # define name of temporary dummy file
+      dummy_file = file_name + '.bak'
+      # open original file in read mode and dummy file in write mode
+      with open(file_name, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
+          # Write given line to the dummy file
+          write_obj.write(line + '\n')
+          # Read lines from original file one by one and append them to the dummy file
+          for line in read_obj:
+              write_obj.write(line)
+      # remove original file
+      os.remove(file_name)
+      # Rename dummy file as the original file
+      os.rename(dummy_file, file_name)
+
+    with open('Airport.txt') as f:
+      first_line = f.readline()
+
+    if first_line == 'Airport Code,Airport Name,Liverpool John Lennon,Bournemouth International':
+      pass
+    else:
+      prepend_line('Airport.txt','Airport Code,Airport Name,Liverpool John Lennon,Bournemouth International')
     #in this version of the program, the raw_data is not used as you can have access to the text file but in cases where you don't have MY version of the csv file, you can use the other version of the program
     data = pd.read_csv(r"Airport.txt")
     df = pd.DataFrame(data,
